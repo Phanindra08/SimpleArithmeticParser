@@ -20,8 +20,12 @@ factor
     ;
 
 number
-    : number DIGIT
-    | DIGIT
+    : number digit
+    | digit
+    ;
+
+digit
+    : DIGIT
     ;
 
 DIGIT           : [0-9];
