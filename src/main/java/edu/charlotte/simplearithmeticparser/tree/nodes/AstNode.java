@@ -1,4 +1,4 @@
-package edu.charlotte.simplearithmeticparser.ast.nodes;
+package edu.charlotte.simplearithmeticparser.tree.nodes;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,13 +38,13 @@ public class AstNode {
     }
 
     // Generating the AST in a tree structure
-    public void generateAstTree(String indent, boolean isLast, StringBuilder astOutputTree) {
+    public void generateTree(String indent, boolean isLast, StringBuilder outputTree) {
         String connector = isLast ? "└── " : "├── "; // Decide whether to use └── (last child) or ├── (middle child) for the current node.
-        astOutputTree.append(indent).append(connector).append(value).append("\n");
+        outputTree.append(indent).append(connector).append(value).append("\n");
         log.debug("Processed AST tree node: '{}'", value);
         String childIndent = indent + (isLast ? "    " : "│   "); // Determine new indentation for child nodes
         for (int i = 0; i < children.size(); i++)
-            children.get(i).generateAstTree(childIndent, i == children.size() - 1, astOutputTree);
+            children.get(i).generateTree(childIndent, i == children.size() - 1, outputTree);
     }
 
     @Override

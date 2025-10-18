@@ -13,24 +13,24 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 @Getter
 @Slf4j
 @StepScope
-public abstract class AbstractAstGenerator<L extends Lexer, P extends Parser,
+public abstract class AbstractPTGenerator<L extends Lexer, P extends Parser,
         TListener extends ParseTreeListener> {
 
     private int lexerErrorCount;
     private int parserErrorCount;
     private TListener listener;
 
-    public AbstractAstGenerator() {
+    public AbstractPTGenerator() {
         this.lexerErrorCount = 0;
         this.parserErrorCount = 0;
-        log.info("Initialized the Ast Generator instance for '{}'.", getTypeName());
+        log.info("Initialized the Parse Tree Generator instance for '{}'.", getTypeName());
     }
 
     // Abstract methods to be implemented by subclasses
     protected abstract L createLexerInstance(CharStream input);
     protected abstract P createParserInstance(CommonTokenStream tokens);
     protected abstract ParseTree invokeTopLevelParseRule(P parser);
-    protected abstract TListener createAstListenerInstance();
+    protected abstract TListener createParseTreeListenerInstance();
     public abstract String getTypeName();
 
     // Common ANTLR components methods
@@ -101,11 +101,11 @@ public abstract class AbstractAstGenerator<L extends Lexer, P extends Parser,
         return tree;
     }
 
-    public String generateAstFromInput(String input) {
+    public String generateParseTreeFromInput(String input) {
         // Reset counts and listener for each input item being processed.
         this.lexerErrorCount = 0;
         this.parserErrorCount = 0;
-        this.listener = createAstListenerInstance();
+        this.listener = createParseTreeListenerInstance();
 
         ParseTree tree;
         try {
@@ -116,20 +116,20 @@ public abstract class AbstractAstGenerator<L extends Lexer, P extends Parser,
             return "Parsing infrastructure failed: " + e.getMessage();
         }
 
-        // Only generate AST if there are no syntax errors
+        // Only generate Parse Tree if there are no syntax errors
         if (this.lexerErrorCount == 0 && this.parserErrorCount == 0) {
-            log.info("No syntax errors. Proceeding with AST generation for {}.", getTypeName());
+            log.info("No syntax errors. Proceeding with Parse Tree generation for {}.", getTypeName());
             ParseTreeWalker walker = new ParseTreeWalker();
             try {
                 walker.walk(listener, tree);
-                log.info("AST generated successfully for the {}.", getTypeName());
+                log.info("Parse Tree generated successfully for the {}.", getTypeName());
             } catch (Exception e) {
-                log.error("Error during AST Generation for the {}: {}", getTypeName(), e.getMessage(), e);
-                throw new RuntimeException("Error during AST generation for the " + getTypeName() + ".", e);
+                log.error("Error during Parse Tree Generation for the {}: {}", getTypeName(), e.getMessage(), e);
+                throw new RuntimeException("Error during Parse Tree generation for the " + getTypeName() + ".", e);
             }
             return null;
         } else {
-            StringBuilder message = new StringBuilder("No AST generated for the ");
+            StringBuilder message = new StringBuilder("No Parse Tree generated for the ");
             message.append(getTypeName()).append(" due to ");
             boolean hasLexerErrors = false;
             if (this.lexerErrorCount > 0) {

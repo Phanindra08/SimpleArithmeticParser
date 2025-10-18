@@ -1,6 +1,6 @@
 package edu.charlotte.simplearithmeticparser.utils;
 
-import edu.charlotte.simplearithmeticparser.ast.nodes.AstNode;
+import edu.charlotte.simplearithmeticparser.tree.nodes.AstNode;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.Stack;
 
 @Slf4j
-public class AstListenerUtils {
-    private AstListenerUtils() {}
+public class ParseTreeListenerUtils {
+    private ParseTreeListenerUtils() {}
     public static List<AstNode> exitGrammarRule(ParserRuleContext ctx, Stack<AstNode> stack) {
         int expectedChildrenCount = ctx.getChildCount();
         if (stack.size() < expectedChildrenCount) {
             log.error("Stack underflow: Expected {} children for the rule '{}', but the stack has only {} elements.",
                     expectedChildrenCount, ctx.getText(), stack.size());
-            throw new IllegalStateException("Critical AST construction error for the rule: " + ctx.getText());
+            throw new IllegalStateException("Critical Parse Tree construction error for the rule: " + ctx.getText());
         }
 
         List<AstNode> grammarRuleChildNodes = new ArrayList<>(expectedChildrenCount);

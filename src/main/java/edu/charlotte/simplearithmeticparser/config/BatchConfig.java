@@ -33,7 +33,7 @@ public class BatchConfig implements ApplicationRunner {
             Job loadSimpleArithmeticAstGenerationJob,
             Job loadSimpleArithmeticParseTreeGenerationJob,
             JobLauncher jobLauncher,
-            @Value("${dl-output}") String outputFilePath) {
+            @Value("${simple-arithmetic-output}") String outputFilePath) {
         this.loadSimpleArithmeticAstGenerationJob = loadSimpleArithmeticAstGenerationJob;
         this.loadSimpleArithmeticParseTreeGenerationJob = loadSimpleArithmeticParseTreeGenerationJob;
         this.jobLauncher = jobLauncher;

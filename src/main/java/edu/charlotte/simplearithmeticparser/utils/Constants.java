@@ -15,13 +15,13 @@ public final class Constants {
     public static final String ERROR_MESSAGE_FOR_MISSING_JOB_PARAMETERS = "Missing required job parameters. " +
             "Use --job.name=<jobName> and --input.file=<inputFile>";
 
-    public static final String AST_NODE_SIMPLE_ARITHMETIC_PROGRAM = "SimpleArithmeticProgram";
-    public static final String AST_NODE_SIMPLE_ARITHMETIC_EXPRESSION = "expr";
-    public static final String AST_NODE_SIMPLE_ARITHMETIC_TERM = "term";
-    public static final String AST_NODE_SIMPLE_ARITHMETIC_FACTOR = "factor";
-    public static final String AST_NODE_SIMPLE_ARITHMETIC_NUMBER = "number";
-    public static final String AST_NODE_SIMPLE_ARITHMETIC_DIGIT = "digit";
+    public static final String PARSE_TREE_NODE_SIMPLE_ARITHMETIC_PROGRAM = "SimpleArithmeticProgram";
+    public static final String PARSE_TREE_NODE_SIMPLE_ARITHMETIC_EXPRESSION = "expr";
+    public static final String PARSE_TREE_NODE_SIMPLE_ARITHMETIC_TERM = "term";
+    public static final String PARSE_TREE_NODE_SIMPLE_ARITHMETIC_FACTOR = "factor";
+    public static final String PARSE_TREE_NODE_SIMPLE_ARITHMETIC_NUMBER = "number";
+    public static final String PARSE_TREE_NODE_SIMPLE_ARITHMETIC_DIGIT = "digit";
 
-    public static final String AST_GENERATION_PROCESS_SUFFIX = " Ast Generation Process";
+    public static final String PARSE_TREE_GENERATION_PROCESS_SUFFIX = " Parse Tree Generation Process";
     public static final String SIMPLE_ARITHMETIC = "Simple Arithmetic";
 }

@@ -2,14 +2,14 @@ package edu.charlotte.simplearithmeticparser.grammars;
 
 import edu.charlotte.simplearithmeticparser.SimpleArithmeticLexer;
 import edu.charlotte.simplearithmeticparser.SimpleArithmeticParser;
-import edu.charlotte.simplearithmeticparser.listeners.ast.SimpleArithmeticAstListener;
+import edu.charlotte.simplearithmeticparser.listeners.parsetree.SimpleArithmeticParseTreeListener;
 import edu.charlotte.simplearithmeticparser.utils.Constants;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-public class GenerateAstForSimpleArithmetic extends AbstractAstGenerator<SimpleArithmeticLexer,
-        SimpleArithmeticParser, SimpleArithmeticAstListener> {
+public class GeneratePTForSimpleArithmetic extends AbstractPTGenerator<SimpleArithmeticLexer,
+        SimpleArithmeticParser, SimpleArithmeticParseTreeListener> {
 
     @Override
     protected SimpleArithmeticLexer createLexerInstance(CharStream input) {
@@ -27,8 +27,8 @@ public class GenerateAstForSimpleArithmetic extends AbstractAstGenerator<SimpleA
     }
 
     @Override
-    protected SimpleArithmeticAstListener createAstListenerInstance() {
-        return new SimpleArithmeticAstListener();
+    protected SimpleArithmeticParseTreeListener createParseTreeListenerInstance() {
+        return new SimpleArithmeticParseTreeListener();
     }
 
     @Override

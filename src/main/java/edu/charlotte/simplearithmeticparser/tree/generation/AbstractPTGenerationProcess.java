@@ -1,7 +1,7 @@
-package edu.charlotte.simplearithmeticparser.ast.generation;
+package edu.charlotte.simplearithmeticparser.tree.generation;
 
-import edu.charlotte.simplearithmeticparser.ast.nodes.AstNode;
-import edu.charlotte.simplearithmeticparser.grammars.AbstractAstGenerator;
+import edu.charlotte.simplearithmeticparser.tree.nodes.AstNode;
+import edu.charlotte.simplearithmeticparser.grammars.AbstractPTGenerator;
 import edu.charlotte.simplearithmeticparser.utils.Constants;
 import edu.charlotte.simplearithmeticparser.utils.ParserUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -15,22 +15,22 @@ import org.springframework.lang.NonNull;
 
 @StepScope
 @Slf4j
-public abstract class AbstractAstGenerationProcess<TGenerator extends AbstractAstGenerator<?, ?, TListener>,
+public abstract class AbstractPTGenerationProcess<TGenerator extends AbstractPTGenerator<?, ?, TListener>,
         TListener extends ParseTreeListener> implements ItemProcessor<String, String>, StepExecutionListener {
 
-    private final TGenerator astGenerator;
+    private final TGenerator parseTreeGenerator;
     private final String processorName;
-    public AbstractAstGenerationProcess(TGenerator astGenerator) {
-        this.astGenerator = astGenerator;
-        this.processorName = this.astGenerator.getTypeName();
+    public AbstractPTGenerationProcess(TGenerator parseTreeGenerator) {
+        this.parseTreeGenerator = parseTreeGenerator;
+        this.processorName = this.parseTreeGenerator.getTypeName();
         log.info("'{}' is initialized.", getDisplayName());
     }
 
     // Abstract methods to be implemented by subclasses
-    protected abstract AstNode getAstRootFromListener(TListener listener);
+    protected abstract AstNode getPTRootFromListener(TListener listener);
 
     private String getDisplayName() {
-        return this.processorName + Constants.AST_GENERATION_PROCESS_SUFFIX;
+        return this.processorName + Constants.PARSE_TREE_GENERATION_PROCESS_SUFFIX;
     }
 
     @Override
@@ -48,27 +48,27 @@ public abstract class AbstractAstGenerationProcess<TGenerator extends AbstractAs
     @Override
     public String process(@NonNull String item) {
         log.debug("Processing the input item: {}.", ParserUtils.formatInputForLogging(item));
-        StringBuilder astOutputTree = new StringBuilder("Generated AST is:").append("\n");
-        String errorMessage = this.astGenerator.generateAstFromInput(item);
+        StringBuilder outputTree = new StringBuilder("Generated Parse Tree is:").append("\n");
+        String errorMessage = this.parseTreeGenerator.generateParseTreeFromInput(item);
         try {
             if(errorMessage == null) {
-                TListener listener = this.astGenerator.getListener();
-                AstNode astRoot = getAstRootFromListener(listener);
-                if(astRoot != null) {
-                    astRoot.generateAstTree("", true, astOutputTree);
-                    log.debug("AST is generated successfully for the {}.", this.processorName);
+                TListener listener = this.parseTreeGenerator.getListener();
+                AstNode parseTreeRoot = getPTRootFromListener(listener);
+                if(parseTreeRoot != null) {
+                    parseTreeRoot.generateTree("", true, outputTree);
+                    log.debug("Parse Tree is generated successfully for the {}.", this.processorName);
                 } else {
-                    String nullAstError = "AST generation completed without any explicit errors, but returned a null AST root.";
-                    log.error("{}", nullAstError);
-                    return nullAstError;
+                    String nullPTError = "Parse Tree generation completed without any explicit errors, but returned a null Parse Tree root.";
+                    log.error("{}", nullPTError);
+                    return nullPTError;
                 }
             } else
                 return errorMessage;
         } catch (Exception e) {
-            log.error("Error during AST generation for the item: {}. The Error is: {}",
+            log.error("Error during Parse Tree generation for the item: {}. The Error is: {}",
                     ParserUtils.formatInputForLogging(item), e.getMessage(), e);
-            throw new RuntimeException("Error during AST generation due to internal error.", e);
+            throw new RuntimeException("Error during Parse Tree generation due to internal error.", e);
         }
-        return astOutputTree.toString();
+        return outputTree.toString();
     }
 }
