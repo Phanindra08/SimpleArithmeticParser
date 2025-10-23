@@ -2,16 +2,16 @@ package edu.charlotte.simplearithmeticparser.grammars;
 
 import edu.charlotte.simplearithmeticparser.SimpleArithmeticLexer;
 import edu.charlotte.simplearithmeticparser.SimpleArithmeticParser;
-import edu.charlotte.simplearithmeticparser.listeners.parsetree.SimpleArithmeticParseTreeListener;
+import edu.charlotte.simplearithmeticparser.listeners.parsetree.SimpleArithmeticAstListener;
 import edu.charlotte.simplearithmeticparser.utils.Constants;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-public class GeneratePTForSimpleArithmetic extends AbstractTreeGenerator<SimpleArithmeticLexer,
-        SimpleArithmeticParser, SimpleArithmeticParseTreeListener> {
+public class GenerateAstForSimpleArithmetic extends AbstractTreeGenerator<SimpleArithmeticLexer,
+        SimpleArithmeticParser, SimpleArithmeticAstListener> {
 
-    public GeneratePTForSimpleArithmetic(String treeType) {
+    public GenerateAstForSimpleArithmetic(String treeType) {
         super(treeType);
     }
 
@@ -31,8 +31,8 @@ public class GeneratePTForSimpleArithmetic extends AbstractTreeGenerator<SimpleA
     }
 
     @Override
-    protected SimpleArithmeticParseTreeListener createTreeListenerInstance() {
-        return new SimpleArithmeticParseTreeListener();
+    protected SimpleArithmeticAstListener createTreeListenerInstance() {
+        return new SimpleArithmeticAstListener();
     }
 
     @Override

@@ -13,24 +13,26 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 @Getter
 @Slf4j
 @StepScope
-public abstract class AbstractPTGenerator<L extends Lexer, P extends Parser,
+public abstract class AbstractTreeGenerator<L extends Lexer, P extends Parser,
         TListener extends ParseTreeListener> {
 
     private int lexerErrorCount;
     private int parserErrorCount;
     private TListener listener;
+    private final String treeType;
 
-    public AbstractPTGenerator() {
+    public AbstractTreeGenerator(String treeType) {
         this.lexerErrorCount = 0;
         this.parserErrorCount = 0;
-        log.info("Initialized the Parse Tree Generator instance for '{}'.", getTypeName());
+        this.treeType = treeType;
+        log.info("Initialized the {} Generator instance for '{}'.", this.treeType, getTypeName());
     }
 
     // Abstract methods to be implemented by subclasses
     protected abstract L createLexerInstance(CharStream input);
     protected abstract P createParserInstance(CommonTokenStream tokens);
     protected abstract ParseTree invokeTopLevelParseRule(P parser);
-    protected abstract TListener createParseTreeListenerInstance();
+    protected abstract TListener createTreeListenerInstance();
     public abstract String getTypeName();
 
     // Common ANTLR components methods
@@ -75,7 +77,7 @@ public abstract class AbstractPTGenerator<L extends Lexer, P extends Parser,
         }
     }
 
-    protected ParseTree creatingParseTree(String input) {
+    protected ParseTree creatingTree(String input) {
         L lexer = initializingLexer(input);
         CommonTokenStream tokens = createTokenStream(lexer);
         P parser = initializingParser(tokens);
@@ -94,42 +96,42 @@ public abstract class AbstractPTGenerator<L extends Lexer, P extends Parser,
                     ParserUtils.formatInputForLogging(input), e);
             throw new RuntimeException("Parsing failed due to grammar recognition error.", e);
         } catch (Exception e) {
-            log.error("Unexpected error during the parse tree creation for the input: {}",
-                    ParserUtils.formatInputForLogging(input), e);
-            throw new RuntimeException("Unexpected error during the parse tree creation.", e);
+            log.error("Unexpected error during the {} creation for the input: {}",
+                    this.treeType, ParserUtils.formatInputForLogging(input), e);
+            throw new RuntimeException("Unexpected error during the creation of the " + this.treeType + ".", e);
         }
         return tree;
     }
 
-    public String generateParseTreeFromInput(String input) {
+    public String generateTreeFromInput(String input) {
         // Reset counts and listener for each input item being processed.
         this.lexerErrorCount = 0;
         this.parserErrorCount = 0;
-        this.listener = createParseTreeListenerInstance();
+        this.listener = createTreeListenerInstance();
 
         ParseTree tree;
         try {
-            tree = creatingParseTree(input);
-            log.info("Parse tree created successfully for the input: {}.", ParserUtils.formatInputForLogging(input));
+            tree = creatingTree(input);
+            log.info("{} created successfully for the input: {}.", this.treeType, ParserUtils.formatInputForLogging(input));
         } catch (RuntimeException e) {
-            log.error("Failed to create parse tree for the input: {}", ParserUtils.formatInputForLogging(input), e);
+            log.error("Failed to create {} for the input: {}", this.treeType, ParserUtils.formatInputForLogging(input), e);
             return "Parsing infrastructure failed: " + e.getMessage();
         }
 
         // Only generate Parse Tree if there are no syntax errors
         if (this.lexerErrorCount == 0 && this.parserErrorCount == 0) {
-            log.info("No syntax errors. Proceeding with Parse Tree generation for {}.", getTypeName());
+            log.info("No syntax errors. Proceeding with {} generation for {}.", this.treeType, getTypeName());
             ParseTreeWalker walker = new ParseTreeWalker();
             try {
                 walker.walk(listener, tree);
-                log.info("Parse Tree generated successfully for the {}.", getTypeName());
+                log.info("{} generated successfully for the {}.", this.treeType, getTypeName());
             } catch (Exception e) {
-                log.error("Error during Parse Tree Generation for the {}: {}", getTypeName(), e.getMessage(), e);
-                throw new RuntimeException("Error during Parse Tree generation for the " + getTypeName() + ".", e);
+                log.error("Error during {} Generation for the {}: {}", this.treeType, getTypeName(), e.getMessage(), e);
+                throw new RuntimeException("Error during generation of " + getTypeName() + this.treeType + ".", e);
             }
             return null;
         } else {
-            StringBuilder message = new StringBuilder("No Parse Tree generated for the ");
+            StringBuilder message = new StringBuilder("No ").append(this.treeType).append(" generated for the ");
             message.append(getTypeName()).append(" due to ");
             boolean hasLexerErrors = false;
             if (this.lexerErrorCount > 0) {
