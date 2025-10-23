@@ -1,8 +1,7 @@
 package edu.charlotte.simplearithmeticparser.tree.generation;
 
 import edu.charlotte.simplearithmeticparser.tree.nodes.AstNode;
-import edu.charlotte.simplearithmeticparser.grammars.AbstractPTGenerator;
-import edu.charlotte.simplearithmeticparser.utils.Constants;
+import edu.charlotte.simplearithmeticparser.grammars.AbstractTreeGenerator;
 import edu.charlotte.simplearithmeticparser.utils.ParserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -15,22 +14,24 @@ import org.springframework.lang.NonNull;
 
 @StepScope
 @Slf4j
-public abstract class AbstractPTGenerationProcess<TGenerator extends AbstractPTGenerator<?, ?, TListener>,
+public abstract class AbstractTreeGenerationProcess<TGenerator extends AbstractTreeGenerator<?, ?, TListener>,
         TListener extends ParseTreeListener> implements ItemProcessor<String, String>, StepExecutionListener {
 
-    private final TGenerator parseTreeGenerator;
+    private final TGenerator treeGenerator;
     private final String processorName;
-    public AbstractPTGenerationProcess(TGenerator parseTreeGenerator) {
-        this.parseTreeGenerator = parseTreeGenerator;
-        this.processorName = this.parseTreeGenerator.getTypeName();
+    private final String treeGenerationSuffix;
+    public AbstractTreeGenerationProcess(TGenerator treeGenerator, String treeGenerationSuffix) {
+        this.treeGenerator = treeGenerator;
+        this.processorName = this.treeGenerator.getTypeName();
+        this.treeGenerationSuffix = treeGenerationSuffix;
         log.info("'{}' is initialized.", getDisplayName());
     }
 
     // Abstract methods to be implemented by subclasses
-    protected abstract AstNode getPTRootFromListener(TListener listener);
+    protected abstract AstNode getTreeRootFromListener(TListener listener);
 
     private String getDisplayName() {
-        return this.processorName + Constants.PARSE_TREE_GENERATION_PROCESS_SUFFIX;
+        return this.processorName + this.treeGenerationSuffix;
     }
 
     @Override
@@ -48,26 +49,28 @@ public abstract class AbstractPTGenerationProcess<TGenerator extends AbstractPTG
     @Override
     public String process(@NonNull String item) {
         log.debug("Processing the input item: {}.", ParserUtils.formatInputForLogging(item));
-        StringBuilder outputTree = new StringBuilder("Generated Parse Tree is:").append("\n");
-        String errorMessage = this.parseTreeGenerator.generateParseTreeFromInput(item);
+        StringBuilder outputTree = new StringBuilder("Generated ").append(this.treeGenerator.getTreeType()).append(" is:").append("\n");
+        String errorMessage = this.treeGenerator.generateTreeFromInput(item);
         try {
             if(errorMessage == null) {
-                TListener listener = this.parseTreeGenerator.getListener();
-                AstNode parseTreeRoot = getPTRootFromListener(listener);
-                if(parseTreeRoot != null) {
-                    parseTreeRoot.generateTree("", true, outputTree);
-                    log.debug("Parse Tree is generated successfully for the {}.", this.processorName);
+                TListener listener = this.treeGenerator.getListener();
+                AstNode treeRoot = getTreeRootFromListener(listener);
+                if(treeRoot != null) {
+                    treeRoot.generateTree("", true, outputTree);
+                    log.debug("{} is generated successfully for the {}.", this.treeGenerator.getTreeType(), this.processorName);
                 } else {
-                    String nullPTError = "Parse Tree generation completed without any explicit errors, but returned a null Parse Tree root.";
+                    String nullPTError = this.treeGenerator.getTreeType() +
+                            " generation completed without any explicit errors, but returned a null " +
+                            this.treeGenerator.getTreeType() + " root.";
                     log.error("{}", nullPTError);
                     return nullPTError;
                 }
             } else
                 return errorMessage;
         } catch (Exception e) {
-            log.error("Error during Parse Tree generation for the item: {}. The Error is: {}",
-                    ParserUtils.formatInputForLogging(item), e.getMessage(), e);
-            throw new RuntimeException("Error during Parse Tree generation due to internal error.", e);
+            log.error("Error during {} generation for the item: {}. The Error is: {}",
+                    this.treeGenerator.getTreeType(), ParserUtils.formatInputForLogging(item), e.getMessage(), e);
+            throw new RuntimeException("Error during " + this.treeGenerator.getTreeType() + " generation due to internal error.", e);
         }
         return outputTree.toString();
     }
