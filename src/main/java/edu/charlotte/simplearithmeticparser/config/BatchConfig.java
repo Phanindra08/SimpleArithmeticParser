@@ -24,18 +24,18 @@ public class BatchConfig implements ApplicationRunner {
 
     // Using final as dependencies are injected via constructor
     private final Job loadSimpleArithmeticAstGenerationJob;
-    private final Job loadSimpleArithmeticParseTreeGenerationJob;
+    private final Job loadSimpleArithmeticPTGenerationJob;
     private final JobLauncher jobLauncher;
     private final String outputFilePath;
 
     // Constructor injection for all dependencies
     public BatchConfig(
             Job loadSimpleArithmeticAstGenerationJob,
-            Job loadSimpleArithmeticParseTreeGenerationJob,
+            Job loadSimpleArithmeticPTGenerationJob,
             JobLauncher jobLauncher,
             @Value("${simple-arithmetic-output}") String outputFilePath) {
         this.loadSimpleArithmeticAstGenerationJob = loadSimpleArithmeticAstGenerationJob;
-        this.loadSimpleArithmeticParseTreeGenerationJob = loadSimpleArithmeticParseTreeGenerationJob;
+        this.loadSimpleArithmeticPTGenerationJob = loadSimpleArithmeticPTGenerationJob;
         this.jobLauncher = jobLauncher;
         this.outputFilePath = outputFilePath;
         log.debug("Batch Config is initialized.");
@@ -114,7 +114,7 @@ public class BatchConfig implements ApplicationRunner {
 
             switch (type) {
                 case SIMPLE_ARITHMETIC_AST_GENERATION -> jobLauncher.run(loadSimpleArithmeticAstGenerationJob, jobParameters);
-                case SIMPLE_ARITHMETIC_PARSE_TREE_GENERATION -> jobLauncher.run(loadSimpleArithmeticParseTreeGenerationJob, jobParameters);
+                case SIMPLE_ARITHMETIC_PARSE_TREE_GENERATION -> jobLauncher.run(loadSimpleArithmeticPTGenerationJob, jobParameters);
             }
         } catch (IllegalArgumentException e) {
             // To catch the invalid job name identified by the enum's getJobType method.

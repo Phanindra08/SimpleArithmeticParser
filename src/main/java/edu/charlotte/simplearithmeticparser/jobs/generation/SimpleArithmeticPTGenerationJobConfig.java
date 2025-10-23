@@ -3,6 +3,7 @@ package edu.charlotte.simplearithmeticparser.jobs.generation;
 import edu.charlotte.simplearithmeticparser.tree.generation.SimpleArithmeticPTGenerationProcess;
 import edu.charlotte.simplearithmeticparser.grammars.GeneratePTForSimpleArithmetic;
 import edu.charlotte.simplearithmeticparser.listeners.common.JobLoggingListener;
+import edu.charlotte.simplearithmeticparser.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -40,7 +41,7 @@ public class SimpleArithmeticPTGenerationJobConfig {
     @StepScope
     public GeneratePTForSimpleArithmetic generatePTForSimpleArithmetic() {
         log.debug("Creating step-scoped GeneratePTForSimpleArithmetic bean.");
-        return new GeneratePTForSimpleArithmetic();
+        return new GeneratePTForSimpleArithmetic(Constants.PARSE_TREE);
     }
 
     @Bean
