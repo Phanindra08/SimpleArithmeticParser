@@ -1,4 +1,4 @@
-# 🚀 Parser Project
+# 🚀 Simple Arithmetic Parser Project
 Welcome to the Simple Arithmetic Parser Project. This guide will help you to set up, build and run the Parser application.
 
 ## 🔧 Prerequisites
