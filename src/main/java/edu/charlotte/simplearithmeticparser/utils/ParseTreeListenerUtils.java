@@ -1,6 +1,6 @@
 package edu.charlotte.simplearithmeticparser.utils;
 
-import edu.charlotte.simplearithmeticparser.tree.nodes.AstNode;
+import edu.charlotte.simplearithmeticparser.tree.nodes.ParseTreeNode;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -12,7 +12,7 @@ import java.util.Stack;
 @Slf4j
 public class ParseTreeListenerUtils {
     private ParseTreeListenerUtils() {}
-    public static List<AstNode> exitGrammarRule(ParserRuleContext ctx, Stack<AstNode> stack) {
+    public static List<ParseTreeNode> exitGrammarRule(ParserRuleContext ctx, Stack<ParseTreeNode> stack) {
         int expectedChildrenCount = ctx.getChildCount();
         if (stack.size() < expectedChildrenCount) {
             log.error("Stack underflow: Expected {} children for the rule '{}', but the stack has only {} elements.",
@@ -20,7 +20,7 @@ public class ParseTreeListenerUtils {
             throw new IllegalStateException("Critical Parse Tree construction error for the rule: " + ctx.getText());
         }
 
-        List<AstNode> grammarRuleChildNodes = new ArrayList<>(expectedChildrenCount);
+        List<ParseTreeNode> grammarRuleChildNodes = new ArrayList<>(expectedChildrenCount);
         for (int index = 0; index < expectedChildrenCount; index++)
             grammarRuleChildNodes.add(stack.pop());
         log.debug("Popped all the {} children from stack for rule '{}'.", expectedChildrenCount, ctx.getText());
@@ -28,7 +28,7 @@ public class ParseTreeListenerUtils {
         return grammarRuleChildNodes;
     }
 
-    public static void addChildrenToLastNodeInStack(List<AstNode> childNodes, String grammarNodeName, String contextText, Stack<AstNode> stack) {
+    public static void addChildrenToLastNodeInStack(List<ParseTreeNode> childNodes, String grammarNodeName, String contextText, Stack<ParseTreeNode> stack) {
         if (childNodes == null) {
             log.warn("Attempted to add a null list as children to the node on top of the stack for the rule '{}' (context: '{}')",
                     grammarNodeName, contextText);
