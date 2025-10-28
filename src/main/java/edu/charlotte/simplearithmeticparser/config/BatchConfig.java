@@ -115,6 +115,25 @@ public class BatchConfig implements ApplicationRunner {
             switch (type) {
                 case SIMPLE_ARITHMETIC_AST_GENERATION -> jobLauncher.run(loadSimpleArithmeticAstGenerationJob, jobParameters);
                 case SIMPLE_ARITHMETIC_PARSE_TREE_GENERATION -> jobLauncher.run(loadSimpleArithmeticPTGenerationJob, jobParameters);
+                case JOBNAME_SIMPLE_ARITHMETIC_BOTH_TREES_GENERATION -> {
+                    log.info("Launching both the Parse Tree and AST generation jobs.");
+
+                    // Launching Parse Tree Generation Job
+                    JobType treeType = JobType.SIMPLE_ARITHMETIC_PARSE_TREE_GENERATION;
+                    // Calling createJobParams method again to get new parameters with a new run id and the correct file extension
+                    JobParameters treeParams = createJobParams(treeType.getJobNameIdentifier(),
+                            inputFile, treeType.getFileExtension());
+                    jobLauncher.run(loadSimpleArithmeticPTGenerationJob, treeParams);
+                    log.info("Launched Parse Tree Generation Job as part of both Trees Generation.");
+
+                    // Launching Ast Generation Job
+                    treeType = JobType.SIMPLE_ARITHMETIC_AST_GENERATION;
+                    // Calling createJobParams method again to get new parameters with a new run id and the correct file extension
+                    treeParams = createJobParams(treeType.getJobNameIdentifier(),
+                            inputFile, treeType.getFileExtension());
+                    jobLauncher.run(loadSimpleArithmeticAstGenerationJob, treeParams);
+                    log.info("Launched Ast Generation Job as part of both Trees Generation.");
+                }
             }
         } catch (IllegalArgumentException e) {
             // To catch the invalid job name identified by the enum's getJobType method.

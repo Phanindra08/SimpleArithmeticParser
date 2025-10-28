@@ -4,6 +4,7 @@ public final class Constants {
     private Constants() {}
     public static final String JOBNAME_SIMPLE_ARITHMETIC_AST_GENERATION = "SIMPLE_ARITHMETIC_AST_GENERATION";
     public static final String JOBNAME_SIMPLE_ARITHMETIC_PARSE_TREE_GENERATION = "SIMPLE_ARITHMETIC_PARSE_TREE_GENERATION";
+    public static final String JOBNAME_SIMPLE_ARITHMETIC_BOTH_TREES_GENERATION = "SIMPLE_ARITHMETIC_BOTH_TREES_GENERATION";
 
     public static final String AST_GENERATION_EXTENSION = "_AST.txt";
     public static final String PARSE_TREE_GENERATION_EXTENSION = "_ParseTree.txt";
@@ -23,5 +24,13 @@ public final class Constants {
     public static final String PARSE_TREE_NODE_SIMPLE_ARITHMETIC_DIGIT = "digit";
 
     public static final String PARSE_TREE_GENERATION_PROCESS_SUFFIX = " Parse Tree Generation Process";
+    public static final String AST_GENERATION_PROCESS_SUFFIX = " AST Generation Process";
     public static final String SIMPLE_ARITHMETIC = "Simple Arithmetic";
+
+    public static final String PARSE_TREE = "Parse Tree";
+    public static final String ABSTRACT_SYNTAX_TREE = "AST";
+
+    public static final String OPEN_BRACKETS = "(";
+    public static final String CLOSE_BRACKETS = ")";
+    public static final String END_OF_FILE = "<EOF>";
 }
