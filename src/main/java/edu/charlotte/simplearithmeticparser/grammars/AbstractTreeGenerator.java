@@ -1,0 +1,153 @@
+package edu.charlotte.simplearithmeticparser.grammars;
+
+import edu.charlotte.simplearithmeticparser.listeners.common.CountingErrorsListener;
+import edu.charlotte.simplearithmeticparser.utils.ParserUtils;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.springframework.batch.core.configuration.annotation.StepScope;
+
+@Getter
+@Slf4j
+@StepScope
+public abstract class AbstractTreeGenerator<L extends Lexer, P extends Parser,
+        TListener extends ParseTreeListener> {
+
+    private int lexerErrorCount;
+    private int parserErrorCount;
+    private TListener listener;
+    private final String treeType;
+
+    public AbstractTreeGenerator(String treeType) {
+        this.lexerErrorCount = 0;
+        this.parserErrorCount = 0;
+        this.treeType = treeType;
+        log.info("Initialized the {} Generator instance for '{}'.", this.treeType, getTypeName());
+    }
+
+    // Abstract methods to be implemented by subclasses
+    protected abstract L createLexerInstance(CharStream input);
+    protected abstract P createParserInstance(CommonTokenStream tokens);
+    protected abstract ParseTree invokeTopLevelParseRule(P parser);
+    protected abstract TListener createTreeListenerInstance();
+    public abstract String getTypeName();
+
+    // Common ANTLR components methods
+    protected L initializingLexer(String input) {
+        CountingErrorsListener lexerErrorListener = new CountingErrorsListener();
+        try {
+            L lexer = createLexerInstance(CharStreams.fromString(input));
+            // Removing the default console error listener and adding a custom one
+            lexer.removeErrorListeners();
+            lexer.addErrorListener(lexerErrorListener);
+            log.debug("Lexer initialized successfully for the input: {}", ParserUtils.formatInputForLogging(input));
+            return lexer;
+        } catch (Exception e) {
+            log.error("Lexer initialization failed for the input: {}", ParserUtils.formatInputForLogging(input), e);
+            throw new RuntimeException("Lexer initialization failed.", e);
+        }
+    }
+
+    protected CommonTokenStream createTokenStream(L lexer) {
+        try {
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            log.debug("Token stream created successfully.");
+            return tokens;
+        } catch (Exception e) {
+            log.error("Token stream creation failed: {}", e.getMessage(), e);
+            throw new RuntimeException("Token stream creation failed.", e);
+        }
+    }
+
+    protected P initializingParser(CommonTokenStream tokens) {
+        CountingErrorsListener parserErrorListener = new CountingErrorsListener();
+        try {
+            P parser = createParserInstance(tokens);
+            // Remove default console error listener and adding a custom one
+            parser.removeErrorListeners();
+            parser.addErrorListener(parserErrorListener);
+            log.debug("Parser initialized successfully.");
+            return parser;
+        } catch (Exception e) {
+            log.error("Parser initialization failed: {}", e.getMessage(), e);
+            throw new RuntimeException("Parser initialization failed.", e);
+        }
+    }
+
+    protected ParseTree creatingTree(String input) {
+        L lexer = initializingLexer(input);
+        CommonTokenStream tokens = createTokenStream(lexer);
+        P parser = initializingParser(tokens);
+
+        // ParseTree reference to parse the input
+        ParseTree tree;
+        try {
+            tree = invokeTopLevelParseRule(parser);
+            this.lexerErrorCount = ((CountingErrorsListener) lexer.getErrorListeners().getFirst()).getErrorCount();
+            this.parserErrorCount = ((CountingErrorsListener) parser.getErrorListeners().getFirst()).getErrorCount();
+
+            log.info("Lexing completed with {} lexer error(s).", this.lexerErrorCount);
+            log.info("Parsing completed with {} parser error(s).", this.parserErrorCount);
+        } catch (RecognitionException e) {
+            log.error("Parsing failed due to grammar recognition error for the input: {}",
+                    ParserUtils.formatInputForLogging(input), e);
+            throw new RuntimeException("Parsing failed due to grammar recognition error.", e);
+        } catch (Exception e) {
+            log.error("Unexpected error during the {} creation for the input: {}",
+                    this.treeType, ParserUtils.formatInputForLogging(input), e);
+            throw new RuntimeException("Unexpected error during the creation of the " + this.treeType + ".", e);
+        }
+        return tree;
+    }
+
+    public String generateTreeFromInput(String input) {
+        // Reset counts and listener for each input item being processed.
+        this.lexerErrorCount = 0;
+        this.parserErrorCount = 0;
+        this.listener = createTreeListenerInstance();
+
+        ParseTree tree;
+        try {
+            tree = creatingTree(input);
+            log.info("{} created successfully for the input: {}.", this.treeType, ParserUtils.formatInputForLogging(input));
+        } catch (RuntimeException e) {
+            log.error("Failed to create {} for the input: {}", this.treeType, ParserUtils.formatInputForLogging(input), e);
+            return "Parsing infrastructure failed: " + e.getMessage();
+        }
+
+        // Only generate Parse Tree if there are no syntax errors
+        if (this.lexerErrorCount == 0 && this.parserErrorCount == 0) {
+            log.info("No syntax errors. Proceeding with {} generation for {}.", this.treeType, getTypeName());
+            ParseTreeWalker walker = new ParseTreeWalker();
+            try {
+                walker.walk(listener, tree);
+                log.info("{} generated successfully for the {}.", this.treeType, getTypeName());
+            } catch (Exception e) {
+                log.error("Error during {} Generation for the {}: {}", this.treeType, getTypeName(), e.getMessage(), e);
+                throw new RuntimeException("Error during generation of " + getTypeName() + this.treeType + ".", e);
+            }
+            return null;
+        } else {
+            StringBuilder message = new StringBuilder("No ").append(this.treeType).append(" generated for the ");
+            message.append(getTypeName()).append(" due to ");
+            boolean hasLexerErrors = false;
+            if (this.lexerErrorCount > 0) {
+                hasLexerErrors = true;
+                message.append(this.lexerErrorCount).append(" lexer error(s)");
+            }
+            if (this.parserErrorCount > 0) {
+                if (hasLexerErrors) {
+                    message.append(" and ");
+                }
+                message.append(this.parserErrorCount).append(" parser error(s)");
+            }
+            message.append(".");
+            String finalMessage = message.toString();
+            log.warn("{}", finalMessage);
+            return finalMessage;
+        }
+    }
+}

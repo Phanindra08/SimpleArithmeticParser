@@ -1,0 +1,46 @@
+Generated Parse Tree is:
+└── SimpleArithmeticProgram
+    ├── expr
+    │   └── term
+    │       └── factor
+    │           ├── (
+    │           ├── expr
+    │           │   ├── expr
+    │           │   │   └── term
+    │           │   │       └── factor
+    │           │   │           └── number
+    │           │   │               └── digit
+    │           │   │                   └── 5
+    │           │   ├── +
+    │           │   └── term
+    │           │       └── factor
+    │           │           ├── (
+    │           │           ├── expr
+    │           │           │   ├── expr
+    │           │           │   │   └── term
+    │           │           │   │       └── factor
+    │           │           │   │           └── number
+    │           │           │   │               └── digit
+    │           │           │   │                   └── 3
+    │           │           │   ├── +
+    │           │           │   └── term
+    │           │           │       └── factor
+    │           │           │           ├── (
+    │           │           │           ├── expr
+    │           │           │           │   ├── expr
+    │           │           │           │   │   └── term
+    │           │           │           │   │       └── factor
+    │           │           │           │   │           └── number
+    │           │           │           │   │               └── digit
+    │           │           │           │   │                   └── 2
+    │           │           │           │   ├── +
+    │           │           │           │   └── term
+    │           │           │           │       └── factor
+    │           │           │           │           └── number
+    │           │           │           │               └── digit
+    │           │           │           │                   └── 6
+    │           │           │           └── )
+    │           │           └── )
+    │           └── )
+    └── <EOF>
+

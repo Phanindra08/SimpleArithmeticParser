@@ -1,0 +1,3 @@
+Generated AST is:
+└── 10
+
