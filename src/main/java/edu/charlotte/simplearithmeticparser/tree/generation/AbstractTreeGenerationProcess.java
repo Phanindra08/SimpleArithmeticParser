@@ -1,6 +1,6 @@
 package edu.charlotte.simplearithmeticparser.tree.generation;
 
-import edu.charlotte.simplearithmeticparser.tree.nodes.AstNode;
+import edu.charlotte.simplearithmeticparser.tree.nodes.ParseTreeNode;
 import edu.charlotte.simplearithmeticparser.grammars.AbstractTreeGenerator;
 import edu.charlotte.simplearithmeticparser.utils.ParserUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public abstract class AbstractTreeGenerationProcess<TGenerator extends AbstractT
     }
 
     // Abstract methods to be implemented by subclasses
-    protected abstract AstNode getTreeRootFromListener(TListener listener);
+    protected abstract ParseTreeNode getTreeRootFromListener(TListener listener);
 
     private String getDisplayName() {
         return this.processorName + this.treeGenerationSuffix;
@@ -54,7 +54,7 @@ public abstract class AbstractTreeGenerationProcess<TGenerator extends AbstractT
         try {
             if(errorMessage == null) {
                 TListener listener = this.treeGenerator.getListener();
-                AstNode treeRoot = getTreeRootFromListener(listener);
+                ParseTreeNode treeRoot = getTreeRootFromListener(listener);
                 if(treeRoot != null) {
                     treeRoot.generateTree("", true, outputTree);
                     log.debug("{} is generated successfully for the {}.", this.treeGenerator.getTreeType(), this.processorName);
