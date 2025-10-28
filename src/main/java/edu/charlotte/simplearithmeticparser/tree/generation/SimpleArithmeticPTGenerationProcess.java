@@ -1,6 +1,6 @@
 package edu.charlotte.simplearithmeticparser.tree.generation;
 
-import edu.charlotte.simplearithmeticparser.tree.nodes.AstNode;
+import edu.charlotte.simplearithmeticparser.tree.nodes.ParseTreeNode;
 import edu.charlotte.simplearithmeticparser.grammars.GeneratePTForSimpleArithmetic;
 import edu.charlotte.simplearithmeticparser.listeners.parsetree.SimpleArithmeticParseTreeListener;
 import edu.charlotte.simplearithmeticparser.utils.Constants;
@@ -15,7 +15,7 @@ public class SimpleArithmeticPTGenerationProcess extends AbstractTreeGenerationP
     }
 
     @Override
-    protected AstNode getTreeRootFromListener(SimpleArithmeticParseTreeListener listener) {
+    protected ParseTreeNode getTreeRootFromListener(SimpleArithmeticParseTreeListener listener) {
         return listener.getParseTree();
     }
 }
