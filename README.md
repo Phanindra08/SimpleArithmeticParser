@@ -38,7 +38,7 @@ For a better development experience while using IntelliJ IDEA, please install th
 ## 📦️Build
 If you make any code changes, follow the below commands to rebuild the project and generate a new package.
 ```sh
-mvn clean package
+mvn clean package -DskipTests
 ```
 
 ## Running the Application
@@ -58,10 +58,11 @@ java -jar SimpleArithmeticParser-0.0.1-SNAPSHOT.jar --spring.config.location=app
 ## Available Job Names:
 Choose from the following job names based on your desired operation:
 
-| Job Name                                | Description                                            |
-|-----------------------------------------|--------------------------------------------------------|
-| SIMPLE_ARITHMETIC_PARSE_TREE_GENERATION | Generating Parse Tree for Simple Arithmetic Input File |
-| SIMPLE_ARITHMETIC_AST_GENERATION        | Generating AST for Simple Arithmetic Input File        |
+| Job Name                                | Description                                                |
+|-----------------------------------------|------------------------------------------------------------|
+| SIMPLE_ARITHMETIC_PARSE_TREE_GENERATION | Generating Parse Tree for Simple Arithmetic Input File     |
+| SIMPLE_ARITHMETIC_AST_GENERATION        | Generating AST for Simple Arithmetic Input File            |
+| SIMPLE_ARITHMETIC_BOTH_TREES_GENERATION | Generating both the Trees for Simple Arithmetic Input File |
 
 ## 📝 Notes
 - <b>Sample Input and Output Files: </b> When referring to the sample input and output files, check out the [Inputs](./SampleExamples/Inputs) and [Outputs](./SampleExamples/Outputs) folders. Keep in mind that if you use the sample input files to generate the output, the resulting output file will be identical.
